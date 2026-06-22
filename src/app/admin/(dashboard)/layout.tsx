@@ -36,14 +36,17 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#070b16] text-slate-100">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#FAFAFA] text-[#111111] antialiased">
       <AdminNavbar
         adminName={admin.name || "管理員"}
         adminUsername={admin.username}
       />
-      <main className="flex-grow max-w-7xl w-full mx-auto p-6 md:p-8">
-        {children}
-      </main>
+      {/* Main Content Area: offset on desktop by the sidebar width (64 / 16rem) */}
+      <div className="flex-grow flex flex-col md:pl-64 w-full min-w-0">
+        <main className="flex-grow p-4 md:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

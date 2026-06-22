@@ -16,24 +16,24 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0f172a] px-4 text-center">
-      <div className="w-20 h-20 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-6 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
-        <AlertTriangle className="w-10 h-10" />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#FAFAFA] px-4 text-center text-[#111111] antialiased">
+      <div className="w-16 h-16 rounded-xl bg-[#FEF2F2] border border-[#FEF2F2] flex items-center justify-center text-[#B91C1C] mb-4">
+        <AlertTriangle className="w-8 h-8" />
       </div>
       
-      <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-2">
+      <h1 className="text-xl font-bold text-[#111111] mb-2 tracking-tight">
         系統發生非預期錯誤
       </h1>
       
-      <p className="text-sm text-slate-400 max-w-md mb-8">
-        抱歉，系統運作時發生了非預期錯誤。這可能是暫時性的連線問題，您可以嘗試重新整理。
+      <p className="text-xs text-[#666666] max-w-sm mb-6 leading-relaxed">
+        抱歉，系統運作時發生了非預期錯誤。這可能是暫時性的連線問題，您可以嘗試重新整理或點擊下方重試。
       </p>
       
       <button
         onClick={() => reset()}
-        className="flex items-center gap-2 bg-slate-900/60 hover:bg-slate-800/60 border border-slate-800 active:border-slate-700 text-xs font-bold text-slate-200 px-5 py-3 rounded-xl transition-all shadow-lg cursor-pointer"
+        className="flex items-center gap-1.5 bg-[#111111] hover:bg-[#222222] text-white text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-sm cursor-pointer"
       >
-        <RotateCcw className="w-4 h-4 text-red-500 animate-[spin_4s_linear_infinite]" />
+        <RotateCcw className="w-3.5 h-3.5" />
         重新嘗試
       </button>
     </div>

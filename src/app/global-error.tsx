@@ -11,31 +11,30 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to Render/production logs console
     console.error("Global crash caught:", error);
   }, [error]);
 
   return (
     <html lang="zh-TW" className="h-full">
-      <body className="min-h-full flex flex-col bg-[#0f172a] text-slate-100 items-center justify-center px-4 text-center">
-        <div className="flex flex-col items-center justify-center max-w-md">
-          <div className="w-20 h-20 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-6 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
-            <AlertCircle className="w-10 h-10" />
+      <body className="min-h-full flex flex-col bg-[#FAFAFA] text-[#111111] items-center justify-center px-4 text-center antialiased">
+        <div className="flex flex-col items-center justify-center max-w-sm">
+          <div className="w-16 h-16 rounded-xl bg-[#FEF2F2] border border-[#FEF2F2] flex items-center justify-center text-[#B91C1C] mb-4">
+            <AlertCircle className="w-8 h-8" />
           </div>
           
-          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-2">
+          <h1 className="text-xl font-bold text-[#111111] mb-2 tracking-tight">
             應用程式載入失敗
           </h1>
           
-          <p className="text-sm text-slate-400 mb-8">
+          <p className="text-xs text-[#666666] mb-6 leading-relaxed">
             抱歉，核心排版或基礎服務載入失敗。請檢查您的網路狀態，或聯絡店長處理。
           </p>
           
           <button
             onClick={() => reset()}
-            className="flex items-center gap-2 bg-slate-900/60 hover:bg-slate-800/60 border border-slate-800 active:border-slate-700 text-xs font-bold text-slate-200 px-5 py-3 rounded-xl transition-all shadow-lg cursor-pointer"
+            className="flex items-center gap-1.5 bg-[#111111] hover:bg-[#222222] text-white text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-sm cursor-pointer"
           >
-            <RotateCcw className="w-4 h-4 text-red-500" />
+            <RotateCcw className="w-3.5 h-3.5" />
             重試一次
           </button>
         </div>

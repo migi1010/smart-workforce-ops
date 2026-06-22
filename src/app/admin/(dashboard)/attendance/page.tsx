@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { 
   Calendar, 
-  Users, 
-  Clock, 
   Search, 
   Plus, 
   Edit3, 
@@ -12,12 +10,11 @@ import {
   X, 
   AlertCircle, 
   Filter, 
-  CheckCircle2, 
-  MapPin, 
   Loader2,
   RefreshCw,
   HelpCircle,
-  Laptop
+  MapPin,
+  CheckCircle2
 } from "lucide-react";
 
 interface Employee {
@@ -197,7 +194,6 @@ export default function AttendancePage() {
 
       setEditingRecord(null);
       fetchAttendance();
-      // If drawer is open with this record, update it or close drawer
       if (selectedRecord && selectedRecord.id === editingRecord.id) {
         setIsDrawerOpen(false);
       }
@@ -222,7 +218,6 @@ export default function AttendancePage() {
 
     setCreateSubmitting(true);
     try {
-      // Use chosen date with midnight Taiwan time to initialize timestamps if times are enabled
       const formattedClockIn = createHasIn && createClockIn ? fromDatetimeLocalString(`${createDate}T${createClockIn}`) : null;
       const formattedClockOut = createHasOut && createClockOut ? fromDatetimeLocalString(`${createDate}T${createClockOut}`) : null;
 
@@ -247,7 +242,6 @@ export default function AttendancePage() {
       }
 
       setIsCreateModalOpen(false);
-      // Reset form
       setCreateEmployeeId("");
       setCreateDate("");
       setCreateClockIn("");
@@ -284,17 +278,16 @@ export default function AttendancePage() {
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case "NORMAL":
-        return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25";
+        return "bg-[#F0FDF4] text-[#166534] border border-[#F0FDF4]";
       case "LATE":
-        return "bg-amber-500/10 text-amber-400 border border-amber-500/25";
       case "EARLY_LEAVE":
-        return "bg-orange-500/10 text-orange-400 border border-orange-500/25";
+        return "bg-[#FFFBEB] text-[#B45309] border border-[#FFFBEB]";
       case "ABSENT":
-        return "bg-red-500/10 text-red-400 border border-red-500/25";
+        return "bg-[#FEF2F2] text-[#B91C1C] border border-[#FEF2F2]";
       case "LEAVE":
-        return "bg-blue-500/10 text-blue-400 border border-blue-500/25";
+        return "bg-[#EFF6FF] text-[#1D4ED8] border border-[#EFF6FF]";
       default:
-        return "bg-slate-800 text-slate-400 border border-slate-700";
+        return "bg-[#F3F4F6] text-[#4B5563] border border-[#F3F4F6]";
     }
   };
 
@@ -312,15 +305,13 @@ export default function AttendancePage() {
   const getLocationBadgeClass = (status: string) => {
     switch (status) {
       case "NORMAL":
-        return "bg-emerald-500/10 text-emerald-400";
+        return "bg-[#F0FDF4] text-[#166534] border border-[#F0FDF4]";
       case "SUSPICIOUS":
-        return "bg-amber-500/10 text-amber-400";
+        return "bg-[#FFFBEB] text-[#B45309] border border-[#FFFBEB]";
       case "BLOCKED":
-        return "bg-red-500/10 text-red-400";
-      case "LOCATION_DENIED":
-        return "bg-slate-800 text-slate-400";
+        return "bg-[#FEF2F2] text-[#B91C1C] border border-[#FEF2F2]";
       default:
-        return "bg-slate-900 text-slate-500";
+        return "bg-[#F3F4F6] text-[#4B5563] border border-[#F3F4F6]";
     }
   };
 
@@ -335,20 +326,19 @@ export default function AttendancePage() {
   };
 
   return (
-    <div className="space-y-8 animate-[fadeIn_0.3s_ease-out]">
+    <div className="space-y-6">
       
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 md:p-8 rounded-2xl glass-card relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-2xl -z-10" />
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
-            <Calendar className="w-6 h-6" />
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-5 rounded-xl border border-[#E5E7EB] bg-white shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-slate-100 border border-[#E5E7EB] flex items-center justify-center text-[#111111]">
+            <Calendar className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 via-amber-200 to-red-400 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-[#111111] tracking-tight">
               出勤管理中心
             </h1>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#666666] mt-0.5">
               檢視員工打卡紀錄、GPS 位置稽核、異常定位事件，並在需要時進行人工補登或出勤時間修正。
             </p>
           </div>
@@ -356,7 +346,7 @@ export default function AttendancePage() {
         <div className="flex-shrink-0">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 transition-all shadow-md shadow-amber-500/10 active:scale-[0.98] cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-white bg-[#111111] hover:bg-[#222222] transition-all shadow-sm cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             手動補登出勤
@@ -365,31 +355,31 @@ export default function AttendancePage() {
       </div>
 
       {/* Filters Section */}
-      <div className="p-5 rounded-2xl glass-card border border-slate-800 space-y-4">
-        <h2 className="text-xs font-bold text-slate-400 tracking-wider flex items-center gap-1.5 uppercase">
-          <Filter className="w-4 h-4 text-amber-500" />
+      <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white shadow-sm space-y-3">
+        <h2 className="text-xs font-bold text-[#666666] tracking-wider flex items-center gap-1.5 uppercase">
+          <Filter className="w-3.5 h-3.5 text-[#111111]" />
           篩選過濾條件
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           
           {/* Date Picker */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500">日期</label>
+            <label className="text-[10px] font-bold text-[#666666]">日期</label>
             <input
               type="date"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
-              className="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+              className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
             />
           </div>
 
           {/* Employee Selector */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500">員工</label>
+            <label className="text-[10px] font-bold text-[#666666]">員工</label>
             <select
               value={filterEmployeeId}
               onChange={(e) => setFilterEmployeeId(e.target.value)}
-              className="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+              className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] font-semibold"
             >
               <option value="">全部員工</option>
               {employees.map((emp) => (
@@ -402,11 +392,11 @@ export default function AttendancePage() {
 
           {/* Attendance Status */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500">出勤狀態</label>
+            <label className="text-[10px] font-bold text-[#666666]">出勤狀態</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+              className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] font-semibold"
             >
               <option value="">全部狀態</option>
               <option value="NORMAL">正常</option>
@@ -419,11 +409,11 @@ export default function AttendancePage() {
 
           {/* Location Status */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500">定位狀態</label>
+            <label className="text-[10px] font-bold text-[#666666]">定位狀態</label>
             <select
               value={filterLocationStatus}
               onChange={(e) => setFilterLocationStatus(e.target.value)}
-              className="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+              className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] font-semibold"
             >
               <option value="">全部定位</option>
               <option value="NORMAL">店內範圍 (NORMAL)</option>
@@ -445,108 +435,101 @@ export default function AttendancePage() {
                 setFilterStatus("");
                 setFilterLocationStatus("");
               }}
-              className="text-[10px] font-bold text-slate-500 hover:text-amber-500 flex items-center gap-1"
+              className="text-[10px] font-bold text-[#666666] hover:text-[#111111] flex items-center gap-1 cursor-pointer"
             >
               <RefreshCw className="w-3 h-3" />
-              清除所有篩選條件
+              重設篩選條件
             </button>
           </div>
         )}
       </div>
 
-      {/* Attendance Data Table */}
-      {error && (
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <p>{error}</p>
-        </div>
-      )}
-
+      {/* Main Records Board */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-slate-500 font-semibold">
-          <Loader2 className="w-8 h-8 animate-spin text-amber-500 mr-2.5" />
-          讀取排班與打卡數據中...
+        <div className="p-12 text-center border border-[#E5E7EB] rounded-xl bg-white text-[#666666]">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#111111]" />
+          <p className="text-xs font-semibold mt-3">載入出勤資料中...</p>
         </div>
       ) : records.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-dashed border-slate-800 bg-slate-950/20 text-slate-500">
-          <AlertCircle className="w-10 h-10 mx-auto mb-3 text-slate-700" />
-          <p className="text-sm font-semibold">找不到符合條件的出勤紀錄</p>
-          <p className="text-xs text-slate-600 mt-1">請嘗試修改篩選條件，或進行手動補登。</p>
+        <div className="p-12 text-center rounded-xl border border-dashed border-[#E5E7EB] bg-[#FAFAFA] text-[#666666]">
+          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-[#888888]" />
+          <p className="text-xs font-semibold">找不到符合條件的出勤紀錄</p>
+          <p className="text-[10px] text-[#888888] mt-0.5">請嘗試修改篩選條件，或進行手動補登。</p>
         </div>
       ) : (
-        <div className="glass-card rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl">
+        <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-950/40 text-slate-400 font-bold uppercase tracking-wider">
-                  <th className="py-4 px-5">日期</th>
-                  <th className="py-4 px-5">員工編號</th>
-                  <th className="py-4 px-5">員工姓名</th>
-                  <th className="py-4 px-5">上班時間</th>
-                  <th className="py-4 px-5">下班時間</th>
-                  <th className="py-4 px-5 text-right">工時 (小時)</th>
-                  <th className="py-4 px-5 text-center">出勤狀態</th>
-                  <th className="py-4 px-5 text-center">定位狀態</th>
-                  <th className="py-4 px-5 text-center">店長修改</th>
-                  <th className="py-4 px-5 text-right">操作</th>
+                <tr className="border-b border-[#E5E7EB] bg-[#FAFAFA] text-[#666666] font-bold uppercase tracking-wider sticky top-0">
+                  <th className="py-2.5 px-4">日期</th>
+                  <th className="py-2.5 px-4">員工編號</th>
+                  <th className="py-2.5 px-4">員工姓名</th>
+                  <th className="py-2.5 px-4">上班時間</th>
+                  <th className="py-2.5 px-4">下班時間</th>
+                  <th className="py-2.5 px-4 text-right">工時 (小時)</th>
+                  <th className="py-2.5 px-4 text-center">出勤狀態</th>
+                  <th className="py-2.5 px-4 text-center">定位狀態</th>
+                  <th className="py-2.5 px-4 text-center">修改狀態</th>
+                  <th className="py-2.5 px-4 text-right">操作</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/40">
+              <tbody className="divide-y divide-[#E5E7EB]">
                 {records.map((record) => (
                   <tr 
                     key={record.id} 
                     onClick={() => openDrawer(record)}
-                    className="hover:bg-slate-900/20 transition-colors text-slate-300 cursor-pointer group"
+                    className="hover:bg-[#F5F5F5] transition-colors text-[#111111] cursor-pointer group"
                   >
-                    <td className="py-3.5 px-5 font-semibold font-mono">
+                    <td className="py-2.5 px-4 font-semibold font-mono">
                       {formatTaiwanDate(record.date)}
                     </td>
-                    <td className="py-3.5 px-5 font-semibold font-mono text-slate-400">
+                    <td className="py-2.5 px-4 font-semibold font-mono text-[#666666]">
                       {record.employee.employeeCode}
                     </td>
-                    <td className="py-3.5 px-5 font-bold text-slate-200">
+                    <td className="py-2.5 px-4 font-bold">
                       {record.employee.name}
                     </td>
-                    <td className="py-3.5 px-5 font-mono">
+                    <td className="py-2.5 px-4 font-mono">
                       {formatTaiwanTime(record.clockInTime)}
                     </td>
-                    <td className="py-3.5 px-5 font-mono">
+                    <td className="py-2.5 px-4 font-mono">
                       {formatTaiwanTime(record.clockOutTime)}
                     </td>
-                    <td className="py-3.5 px-5 font-mono font-bold text-right text-slate-100">
+                    <td className="py-2.5 px-4 font-mono font-bold text-right">
                       {record.totalHours !== null ? record.totalHours.toFixed(2) : "-"}
                     </td>
-                    <td className="py-3.5 px-5 text-center">
+                    <td className="py-2.5 px-4 text-center">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(record.status)}`}>
                         {getStatusText(record.status)}
                       </span>
                     </td>
-                    <td className="py-3.5 px-5 text-center">
+                    <td className="py-2.5 px-4 text-center">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${getLocationBadgeClass(record.summaryLocationStatus)}`}>
                         {getLocationText(record.summaryLocationStatus)}
                       </span>
                     </td>
-                    <td className="py-3.5 px-5 text-center">
+                    <td className="py-2.5 px-4 text-center">
                       {record.editedByBoss ? (
-                        <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
-                          已編輯
+                        <span className="text-[10px] font-semibold text-[#B45309] bg-[#FFFBEB] border border-[#FFFBEB] px-1.5 py-0.5 rounded">
+                          已變更
                         </span>
                       ) : (
-                        <span className="text-slate-600">-</span>
+                        <span className="text-[#888888]">-</span>
                       )}
                     </td>
-                    <td className="py-3.5 px-5 text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex justify-end gap-2">
+                    <td className="py-2 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end gap-1.5">
                         <button
                           onClick={(e) => openEditModal(record, e)}
-                          className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:text-amber-500 hover:border-slate-700 transition-all cursor-pointer"
+                          className="p-1.5 rounded border border-[#E5E7EB] bg-white hover:bg-[#F5F5F5] text-[#111111] transition-all cursor-pointer"
                           title="修改出勤時間與狀態"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => openDrawer(record)}
-                          className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:text-amber-500 hover:border-slate-700 transition-all cursor-pointer"
+                          className="p-1.5 rounded border border-[#E5E7EB] bg-white hover:bg-[#F5F5F5] text-[#111111] transition-all cursor-pointer"
                           title="檢視詳細 GPS 與打卡日誌"
                         >
                           <Info className="w-3.5 h-3.5" />
@@ -561,123 +544,121 @@ export default function AttendancePage() {
         </div>
       )}
 
-      {/* ========================================== */}
-      {/* 1. DETAIL DRAWER (Slide-out Panel) */}
-      {/* ========================================== */}
+      {/* ========================================================
+          1. DETAIL DRAWER (Slide-out Panel)
+         ======================================================== */}
       {isDrawerOpen && selectedRecord && (
         <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsDrawerOpen(false)} />
+          <div className="absolute inset-0 bg-black/40" onClick={() => setIsDrawerOpen(false)} />
           
-          <div className="absolute inset-y-0 right-0 max-w-xl w-full bg-[#0b0f19] border-l border-slate-800 shadow-2xl flex flex-col h-full animate-[slideInRight_0.25s_ease-out]">
+          <div className="absolute inset-y-0 right-0 max-w-xl w-full bg-white border-l border-[#E5E7EB] shadow-lg flex flex-col h-full animate-[slideInRight_0.25s_ease-out]">
             
             {/* Drawer Header */}
-            <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+            <div className="p-5 border-b border-[#E5E7EB] flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-slate-100">出勤詳細資料與軌跡</h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <h3 className="text-sm font-bold text-[#111111]">出勤詳細資料與軌跡</h3>
+                <p className="text-[10px] text-[#666666] mt-0.5">
                   員工：{selectedRecord.employee.name} (工號: {selectedRecord.employee.employeeCode}) ‧ 日期: {formatTaiwanDate(selectedRecord.date)}
                 </p>
               </div>
               <button 
                 onClick={() => setIsDrawerOpen(false)}
-                className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:text-amber-500 hover:border-slate-700 transition-all cursor-pointer"
+                className="p-1.5 rounded border border-[#E5E7EB] hover:bg-[#F5F5F5] text-[#666666] transition-all cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Drawer Content */}
-            <div className="flex-grow overflow-y-auto p-6 space-y-6">
+            <div className="flex-grow overflow-y-auto p-5 space-y-5 text-xs text-[#111111]">
               
               {/* Daily Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-900 text-xs">
-                  <span className="text-[10px] text-slate-500 block font-semibold mb-1">今日核定上班</span>
-                  <span className="text-sm font-bold text-slate-200">{formatTaiwanTime(selectedRecord.clockInTime)}</span>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-lg bg-[#FAFAFA] border border-[#E5E7EB] text-xs">
+                  <span className="text-[10px] text-[#666666] block font-semibold mb-1">今日核定上班</span>
+                  <span className="text-xs font-bold">{formatTaiwanTime(selectedRecord.clockInTime)}</span>
                 </div>
-                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-900 text-xs">
-                  <span className="text-[10px] text-slate-500 block font-semibold mb-1">今日核定下班</span>
-                  <span className="text-sm font-bold text-slate-200">{formatTaiwanTime(selectedRecord.clockOutTime)}</span>
+                <div className="p-3.5 rounded-lg bg-[#FAFAFA] border border-[#E5E7EB] text-xs">
+                  <span className="text-[10px] text-[#666666] block font-semibold mb-1">今日核定下班</span>
+                  <span className="text-xs font-bold">{formatTaiwanTime(selectedRecord.clockOutTime)}</span>
                 </div>
-                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-900 text-xs">
-                  <span className="text-[10px] text-slate-500 block font-semibold mb-1">總累計工時</span>
-                  <span className="text-sm font-bold text-slate-100">
-                    {selectedRecord.totalHours !== null ? `${selectedRecord.totalHours.toFixed(2)} 小時` : "無"}
-                  </span>
-                </div>
-                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-900 text-xs">
-                  <span className="text-[10px] text-slate-500 block font-semibold mb-1">出勤審核狀態</span>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold mt-0.5 ${getStatusBadgeClass(selectedRecord.status)}`}>
+                <div className="p-3.5 rounded-lg bg-[#FAFAFA] border border-[#E5E7EB] text-xs">
+                  <span className="text-[10px] text-[#666666] block font-semibold mb-1">出勤狀態統計</span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(selectedRecord.status)}`}>
                     {getStatusText(selectedRecord.status)}
                   </span>
                 </div>
-              </div>
-
-              {/* Boss Note Box */}
-              <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 text-xs space-y-2">
-                <span className="text-[10px] text-slate-500 block font-bold">店長審核備註</span>
-                <p className="text-slate-300 font-medium leading-relaxed italic">
-                  {selectedRecord.note || "暫無審核備註。"}
-                </p>
-                {selectedRecord.editedByBoss && (
-                  <span className="inline-flex text-[9px] font-bold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded mt-1.5">
-                    ⚠️ 此紀錄已被店長手動修正
+                <div className="p-3.5 rounded-lg bg-[#FAFAFA] border border-[#E5E7EB] text-xs">
+                  <span className="text-[10px] text-[#666666] block font-semibold mb-1">核定總工時</span>
+                  <span className="text-xs font-mono font-bold text-blue-600">
+                    {selectedRecord.totalHours !== null ? `${selectedRecord.totalHours.toFixed(2)} 小時` : "尚未下班"}
                   </span>
-                )}
+                </div>
               </div>
 
-              {/* Raw Clocking Events Flow */}
-              <div className="space-y-4">
-                <h4 className="text-sm font-bold text-slate-200 border-b border-slate-800 pb-1.5 flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-amber-500" />
-                  打卡軌跡歷史 ({selectedRecord.clockEvents.length} 次事件)
+              {/* Note / Memo */}
+              <div className="p-3.5 rounded-lg bg-[#FAFAFA] border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#666666] block font-semibold mb-1">備註 / 異動說明</span>
+                <p className="text-xs font-medium italic text-[#111111]">
+                  {selectedRecord.note ? selectedRecord.note : "無任何系統異動備註。"}
+                </p>
+              </div>
+
+              {/* GPS Track timeline */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-[#111111] uppercase tracking-wider border-b border-[#E5E7EB] pb-1">
+                  打卡定位稽核軌跡
                 </h4>
                 
                 {selectedRecord.clockEvents.length === 0 ? (
-                  <p className="text-xs text-slate-500 py-4 text-center">今日無任何電子打卡事件紀錄（可能為店長手動補登）</p>
+                  <p className="text-xs text-[#666666] py-2">無打卡事件紀錄</p>
                 ) : (
                   <div className="space-y-3">
                     {selectedRecord.clockEvents.map((evt, idx) => (
-                      <div key={evt.id} className="p-4 rounded-xl bg-slate-950/60 border border-slate-900 text-xs space-y-2.5 relative">
-                        <div className="flex items-center justify-between gap-2 border-b border-slate-900 pb-1.5">
-                          <span className={`font-bold ${evt.eventType === "CLOCK_IN" ? "text-amber-400" : "text-indigo-400"}`}>
-                            # {idx + 1} {evt.eventType === "CLOCK_IN" ? "上班打卡 ⊙" : "下班打卡 ⊙"}
+                      <div key={evt.id} className="p-3.5 rounded-lg border border-[#E5E7EB] bg-white space-y-2 relative">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
+                            evt.eventType === "CLOCK_IN" 
+                              ? "bg-[#EFF6FF] text-[#1D4ED8] border-[#EFF6FF]" 
+                              : "bg-[#F3F4F6] text-[#4B5563] border-[#F3F4F6]"
+                          }`}>
+                            {evt.eventType === "CLOCK_IN" ? "上班簽到" : "下班簽退"}
                           </span>
-                          <span className="text-slate-500 font-mono">{new Date(evt.timestamp).toLocaleString("zh-TW")}</span>
+                          <span className="text-[10px] text-[#888888] font-mono">
+                            {new Date(evt.timestamp).toLocaleString("zh-TW")}
+                          </span>
                         </div>
-                        
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-slate-400">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                            <span>定位狀態：</span>
-                            <span className={`font-bold ${getLocationBadgeClass(evt.locationStatus)}`}>
-                              {getLocationText(evt.locationStatus)}
-                            </span>
+
+                        {/* Location Details */}
+                        <div className="grid grid-cols-2 gap-2 text-[10px] text-[#666666] pt-1">
+                          <div>
+                            <span className="block font-semibold">GPS 位置</span>
+                            {evt.latitude !== null && evt.longitude !== null ? (
+                              <span className="font-mono text-[#111111]">
+                                {evt.latitude.toFixed(4)}, {evt.longitude.toFixed(4)}
+                              </span>
+                            ) : (
+                              <span className="text-red-500 font-semibold">拒絕定位</span>
+                            )}
                           </div>
                           <div>
-                            <span>距離店心：</span>
-                            <span className="font-bold text-slate-200">
-                              {evt.distanceMeters !== null ? `${evt.distanceMeters.toFixed(1)} 米` : "未知"}
+                            <span className="block font-semibold">場所距離</span>
+                            <span className="font-mono text-[#111111]">
+                              {evt.distanceMeters !== null ? `${Math.round(evt.distanceMeters)} 公尺` : "無法核對"}
                             </span>
                           </div>
                           <div className="col-span-2">
-                            <span>GPS 座標：</span>
-                            <span className="font-mono text-slate-300">
-                              {evt.latitude !== null && evt.longitude !== null 
-                                ? `${evt.latitude.toFixed(5)}, ${evt.longitude.toFixed(5)}` 
-                                : "拒絕讀取"}
+                            <span className="block font-semibold">定位結果狀態</span>
+                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold ${getLocationBadgeClass(evt.locationStatus)}`}>
+                              {evt.locationStatus === "NORMAL" ? "店內範圍 (NORMAL)" : evt.locationStatus === "SUSPICIOUS" ? "異常位置 (SUSPICIOUS)" : evt.locationStatus === "BLOCKED" ? "超出阻擋 (BLOCKED)" : "拒絕定位"}
                             </span>
                           </div>
-                          <div className="col-span-2">
-                            <span>IP 位址：</span>
-                            <span className="font-mono text-slate-300">{evt.ipAddress || "未知"}</span>
-                          </div>
-                          <div className="col-span-2 flex items-start gap-1">
-                            <Laptop className="w-3.5 h-3.5 text-slate-600 flex-shrink-0 mt-0.5" />
-                            <span className="truncate" title={evt.userAgent || "未知"}>
-                              瀏覽器：{evt.userAgent || "未知"}
-                            </span>
-                          </div>
+                        </div>
+
+                        {/* IP and User Agent */}
+                        <div className="text-[9px] text-[#888888] pt-1.5 border-t border-[#F5F5F5] flex flex-col gap-0.5">
+                          <span>IP 位址: {evt.ipAddress || "未知"}</span>
+                          <span className="truncate">瀏覽器代理: {evt.userAgent || "未知"}</span>
                         </div>
                       </div>
                     ))}
@@ -688,16 +669,16 @@ export default function AttendancePage() {
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/20 flex gap-3">
-              <button
-                onClick={(e) => {
+            <div className="p-4 border-t border-[#E5E7EB] bg-[#FAFAFA] flex gap-2">
+              <button 
+                onClick={() => {
                   setIsDrawerOpen(false);
-                  openEditModal(selectedRecord, e);
+                  openEditModal(selectedRecord, { stopPropagation: () => {} } as any);
                 }}
-                className="flex-grow py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-xs hover:from-amber-400 hover:to-amber-500 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-amber-500/10 active:scale-[0.98]"
+                className="flex-grow py-2 rounded-lg bg-[#111111] hover:bg-[#222222] text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Edit3 className="w-3.5 h-3.5" />
-                修改此筆出勤紀錄
+                修改此筆出勤時間
               </button>
             </div>
 
@@ -706,236 +687,80 @@ export default function AttendancePage() {
       )}
 
       {/* ========================================== */}
-      {/* 2. EDIT MODAL */}
+      {/* 2. EDIT MODAL (Dialog) */}
       {/* ========================================== */}
       {editingRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setEditingRecord(null)} />
-          
-          <div className="relative w-full max-w-lg bg-[#0b0f19] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl animate-[scaleIn_0.2s_ease-out] z-10 text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-[fadeIn_0.2s_ease-out]">
+          <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-xl p-5 relative shadow-lg">
+            <button 
+              onClick={() => setEditingRecord(null)}
+              className="absolute top-4 right-4 text-[#666666] hover:text-[#111111] transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
             
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-100">修改出勤紀錄</h3>
-              <button onClick={() => setEditingRecord(null)} className="text-slate-400 hover:text-slate-200">
-                <X className="w-5 h-5" />
-              </button>
+            <div className="flex items-center gap-2 mb-4">
+              <Edit3 className="w-4 h-4 text-[#111111]" />
+              <h2 className="text-sm font-bold text-[#111111]">修改出勤紀錄</h2>
             </div>
 
-            <form onSubmit={handleEditSubmit} className="p-6 space-y-5 text-sm">
-              <p className="text-xs text-slate-400 font-semibold bg-slate-950/40 p-3 rounded-xl border border-slate-900">
-                修改員工：<span className="text-slate-200 font-bold">{editingRecord.employee.name}</span> (工號: {editingRecord.employee.employeeCode})<br />
-                出勤日期：<span className="text-slate-200 font-bold font-mono">{formatTaiwanDate(editingRecord.date)}</span>
-              </p>
+            <p className="text-[10px] text-[#666666] mb-3">
+              正在修改「{editingRecord.employee.name}」於 {formatTaiwanDate(editingRecord.date)} 的出勤紀錄。
+            </p>
 
+            <form onSubmit={handleEditSubmit} className="space-y-3 text-xs">
+              
               {/* Clock In */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-400">上班打卡時間</label>
-                  <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={editHasIn}
-                      onChange={(e) => setEditHasIn(e.target.checked)}
-                      className="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0"
-                    />
-                    設有上班時間
-                  </label>
-                </div>
+              <div className="space-y-1">
+                <label className="flex items-center gap-1.5 text-xs font-semibold text-[#666666]">
+                  <input
+                    type="checkbox"
+                    checked={editHasIn}
+                    onChange={(e) => setEditHasIn(e.target.checked)}
+                    className="rounded border-[#E5E7EB] text-[#111111] focus:ring-0 cursor-pointer"
+                  />
+                  啟用上班時間打卡
+                </label>
                 {editHasIn && (
                   <input
                     type="datetime-local"
                     required
                     value={editClockIn}
                     onChange={(e) => setEditClockIn(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50"
+                    className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                   />
                 )}
               </div>
 
               {/* Clock Out */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-400">下班打卡時間</label>
-                  <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={editHasOut}
-                      onChange={(e) => setEditHasOut(e.target.checked)}
-                      className="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0"
-                    />
-                    設有下班時間
-                  </label>
-                </div>
+              <div className="space-y-1">
+                <label className="flex items-center gap-1.5 text-xs font-semibold text-[#666666]">
+                  <input
+                    type="checkbox"
+                    checked={editHasOut}
+                    onChange={(e) => setEditHasOut(e.target.checked)}
+                    className="rounded border-[#E5E7EB] text-[#111111] focus:ring-0 cursor-pointer"
+                  />
+                  啟用下班時間打卡
+                </label>
                 {editHasOut && (
                   <input
                     type="datetime-local"
                     required
                     value={editClockOut}
                     onChange={(e) => setEditClockOut(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50"
-                  />
-                )}
-              </div>
-
-              {/* Attendance Status */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400">出勤狀態審核</label>
-                <select
-                  value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50"
-                >
-                  <option value="NORMAL">正常 (NORMAL)</option>
-                  <option value="LATE">遲到 (LATE)</option>
-                  <option value="EARLY_LEAVE">早退 (EARLY_LEAVE)</option>
-                  <option value="ABSENT">缺勤 (ABSENT)</option>
-                  <option value="LEAVE">請假 (LEAVE)</option>
-                </select>
-              </div>
-
-              {/* Notes */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400">修正原因與備註</label>
-                <textarea
-                  value={editNote}
-                  onChange={(e) => setEditNote(e.target.value)}
-                  placeholder="請輸入修改的原因（例如：員工忘記打卡，店長手動補正）"
-                  rows={3}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 placeholder:text-slate-700 leading-normal"
-                />
-              </div>
-
-              {/* Form Buttons */}
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-800/80">
-                <button
-                  type="button"
-                  onClick={() => setEditingRecord(null)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-900 text-xs font-bold text-slate-300 transition-all cursor-pointer"
-                >
-                  取消
-                </button>
-                <button
-                  type="submit"
-                  disabled={editSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-xs hover:from-amber-400 hover:to-amber-500 transition-all cursor-pointer shadow-md disabled:opacity-50 flex items-center gap-1.5"
-                >
-                  {editSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  確認更新
-                </button>
-              </div>
-
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================== */}
-      {/* 3. CREATE / MANUAL COMPLEMENT MODAL */}
-      {/* ========================================== */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCreateModalOpen(false)} />
-          
-          <div className="relative w-full max-w-lg bg-[#0b0f19] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl animate-[scaleIn_0.2s_ease-out] z-10 text-left">
-            
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-100">手動補登出勤紀錄</h3>
-              <button onClick={() => setIsCreateModalOpen(false)} className="text-slate-400 hover:text-slate-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateSubmit} className="p-6 space-y-5 text-sm">
-              
-              {/* Select Employee */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400">選擇補登員工</label>
-                <select
-                  required
-                  value={createEmployeeId}
-                  onChange={(e) => setCreateEmployeeId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50"
-                >
-                  <option value="">-- 請選擇員工 --</option>
-                  {employees.map((emp) => (
-                    <option key={emp.id} value={emp.id}>
-                      {emp.name} ({emp.employeeCode})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Select Date */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400">補登日期</label>
-                <input
-                  type="date"
-                  required
-                  value={createDate}
-                  onChange={(e) => setCreateDate(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50"
-                />
-              </div>
-
-              {/* Clock In Time */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-400">補登上班時間 (CLOCK IN)</label>
-                  <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={createHasIn}
-                      onChange={(e) => setCreateHasIn(e.target.checked)}
-                      className="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0"
-                    />
-                    補登此時間
-                  </label>
-                </div>
-                {createHasIn && (
-                  <input
-                    type="time"
-                    step="1"
-                    required
-                    value={createClockIn}
-                    onChange={(e) => setCreateClockIn(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 font-mono"
-                  />
-                )}
-              </div>
-
-              {/* Clock Out Time */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-400">補登下班時間 (CLOCK OUT)</label>
-                  <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={createHasOut}
-                      onChange={(e) => setCreateHasOut(e.target.checked)}
-                      className="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0"
-                    />
-                    補登此時間
-                  </label>
-                </div>
-                {createHasOut && (
-                  <input
-                    type="time"
-                    step="1"
-                    required
-                    value={createClockOut}
-                    onChange={(e) => setCreateClockOut(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 font-mono"
+                    className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                   />
                 )}
               </div>
 
               {/* Status */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400">核定出勤狀態</label>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">核定出勤狀態</label>
                 <select
-                  value={createStatus}
-                  onChange={(e) => setCreateStatus(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50"
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value)}
+                  className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] font-semibold"
                 >
                   <option value="NORMAL">正常 (NORMAL)</option>
                   <option value="LATE">遲到 (LATE)</option>
@@ -946,36 +771,178 @@ export default function AttendancePage() {
               </div>
 
               {/* Note */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400">補登原因與備註</label>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">店長備註/異動說明</label>
                 <textarea
-                  value={createNote}
-                  onChange={(e) => setCreateNote(e.target.value)}
-                  placeholder="請輸入手動補登的原因與註記資訊"
-                  rows={3}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 placeholder:text-slate-700 leading-normal"
+                  value={editNote}
+                  onChange={(e) => setEditNote(e.target.value)}
+                  placeholder="請輸入此筆出勤異動的詳細原因，以供稽核安全查閱。"
+                  className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] placeholder:text-slate-400 leading-normal h-16 resize-none"
                 />
               </div>
 
-              {/* Form Buttons */}
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-800/80">
+              <div className="flex gap-2.5 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setEditingRecord(null)}
+                  className="flex-1 py-2 rounded-lg border border-[#E5E7EB] bg-white text-[#666666] font-semibold hover:bg-[#F5F5F5] transition-all cursor-pointer text-center"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSubmitting}
+                  className="flex-grow py-2 rounded-lg bg-[#111111] hover:bg-[#222222] text-white font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer text-center"
+                >
+                  {editSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  確認修改
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================== */}
+      {/* 3. CREATE MODAL (補登出勤) */}
+      {/* ========================================== */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-[fadeIn_0.2s_ease-out]">
+          <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-xl p-5 relative shadow-lg">
+            <button 
+              onClick={() => setIsCreateModalOpen(false)}
+              className="absolute top-4 right-4 text-[#666666] hover:text-[#111111] transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            
+            <div className="flex items-center gap-2 mb-4">
+              <Plus className="w-4 h-4 text-[#111111]" />
+              <h2 className="text-sm font-bold text-[#111111]">手動新增出勤補登</h2>
+            </div>
+
+            <form onSubmit={handleCreateSubmit} className="space-y-3 text-xs">
+              
+              {/* Employee */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">選擇補登員工</label>
+                <select
+                  required
+                  value={createEmployeeId}
+                  onChange={(e) => setCreateEmployeeId(e.target.value)}
+                  className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] font-semibold"
+                >
+                  <option value="">-- 請選擇員工 --</option>
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.name} ({emp.employeeCode})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">選擇補登日期</label>
+                <input
+                  type="date"
+                  required
+                  value={createDate}
+                  onChange={(e) => setCreateDate(e.target.value)}
+                  className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
+                />
+              </div>
+
+              {/* Clock In */}
+              <div className="space-y-1">
+                <label className="flex items-center gap-1.5 text-xs font-semibold text-[#666666]">
+                  <input
+                    type="checkbox"
+                    checked={createHasIn}
+                    onChange={(e) => setCreateHasIn(e.target.checked)}
+                    className="rounded border-[#E5E7EB] text-[#111111] focus:ring-0 cursor-pointer"
+                  />
+                  補登上班打卡時間
+                </label>
+                {createHasIn && (
+                  <input
+                    type="time"
+                    required
+                    step="1"
+                    value={createClockIn}
+                    onChange={(e) => setCreateClockIn(e.target.value)}
+                    className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] font-mono"
+                  />
+                )}
+              </div>
+
+              {/* Clock Out */}
+              <div className="space-y-1">
+                <label className="flex items-center gap-1.5 text-xs font-semibold text-[#666666]">
+                  <input
+                    type="checkbox"
+                    checked={createHasOut}
+                    onChange={(e) => setCreateHasOut(e.target.checked)}
+                    className="rounded border-[#E5E7EB] text-[#111111] focus:ring-0 cursor-pointer"
+                  />
+                  補登下班打卡時間
+                </label>
+                {createHasOut && (
+                  <input
+                    type="time"
+                    required
+                    step="1"
+                    value={createClockOut}
+                    onChange={(e) => setCreateClockOut(e.target.value)}
+                    className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] font-mono"
+                  />
+                )}
+              </div>
+
+              {/* Status */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">核定出勤狀態</label>
+                <select
+                  value={createStatus}
+                  onChange={(e) => setCreateStatus(e.target.value)}
+                  className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] font-semibold"
+                >
+                  <option value="NORMAL">正常 (NORMAL)</option>
+                  <option value="LATE">遲到 (LATE)</option>
+                  <option value="EARLY_LEAVE">早退 (EARLY_LEAVE)</option>
+                  <option value="ABSENT">缺勤 (ABSENT)</option>
+                  <option value="LEAVE">請假 (LEAVE)</option>
+                </select>
+              </div>
+
+              {/* Note */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">補登原因說明</label>
+                <textarea
+                  value={createNote}
+                  onChange={(e) => setCreateNote(e.target.value)}
+                  placeholder="請說明此筆人工新增補登的具體事由（如：忘記帶打卡手機、員工遲到由主管代行等）"
+                  className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] placeholder:text-slate-400 leading-normal h-16 resize-none"
+                />
+              </div>
+
+              <div className="flex gap-2.5 pt-3">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-900 text-xs font-bold text-slate-300 transition-all cursor-pointer"
+                  className="flex-1 py-2 rounded-lg border border-[#E5E7EB] bg-white text-[#666666] font-semibold hover:bg-[#F5F5F5] transition-all cursor-pointer text-center"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={createSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-xs hover:from-amber-400 hover:to-amber-500 transition-all cursor-pointer shadow-md disabled:opacity-50 flex items-center gap-1.5"
+                  className="flex-grow py-2 rounded-lg bg-[#111111] hover:bg-[#222222] text-white font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer text-center"
                 >
                   {createSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  手動補登建立
+                  確認補登
                 </button>
               </div>
-
             </form>
           </div>
         </div>

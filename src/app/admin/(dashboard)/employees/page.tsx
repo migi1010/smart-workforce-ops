@@ -12,9 +12,7 @@ import {
   Loader2, 
   AlertCircle,
   Phone,
-  DollarSign,
   UserPlus,
-  Calendar,
   X
 } from "lucide-react";
 
@@ -114,86 +112,74 @@ export default function EmployeesPage() {
     setIsPinOpen(true);
   };
 
-  // Handle Create Submit
+  // Create Submit
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
     setFormLoading(true);
-
-    const rate = parseFloat(formRate);
-    if (isNaN(rate) || rate < 0) {
-      setFormError("時薪必須為大於或等於 0 的數字");
-      setFormLoading(false);
-      return;
-    }
 
     try {
       const response = await fetch("/api/admin/employees", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          employeeCode: formCode.toUpperCase().trim(),
+          employeeCode: formCode.trim(),
           name: formName.trim(),
           phone: formPhone.trim() || null,
-          hourlyRate: rate,
-          pin: formPin.trim()
+          hourlyRate: parseFloat(formRate),
+          pin: formPin.trim(),
         }),
       });
 
       const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.error || "新增員工失敗");
+        throw new Error(data.error || "新增失敗");
       }
 
       setIsCreateOpen(false);
       fetchEmployees();
     } catch (err: any) {
-      setFormError(err.message || "發生未知錯誤");
+      setFormError(err.message || "新增員工時發生錯誤");
     } finally {
       setFormLoading(false);
     }
   };
 
-  // Handle Edit Submit
+  // Edit Submit
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEmployee) return;
     setFormError(null);
     setFormLoading(true);
 
-    const rate = parseFloat(formRate);
-    if (isNaN(rate) || rate < 0) {
-      setFormError("時薪必須為大於或等於 0 的數字");
-      setFormLoading(false);
-      return;
-    }
-
     try {
-      const response = await fetch(`/api/admin/employees/${selectedEmployee.id}`, {
-        method: "PATCH",
+      const response = await fetch(`/api/admin/employees?id=${selectedEmployee.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formName.trim(),
           phone: formPhone.trim() || null,
-          hourlyRate: rate,
+          hourlyRate: parseFloat(formRate),
         }),
       });
 
       const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.error || "更新員工資料失敗");
+        throw new Error(data.error || "更新失敗");
       }
 
       setIsEditOpen(false);
       fetchEmployees();
     } catch (err: any) {
-      setFormError(err.message || "發生未知錯誤");
+      setFormError(err.message || "更新員工資料時發生錯誤");
     } finally {
       setFormLoading(false);
     }
   };
 
-  // Handle PIN Submit
+  // PIN Submit
   const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEmployee) return;
@@ -201,52 +187,54 @@ export default function EmployeesPage() {
     setFormLoading(true);
 
     try {
-      const response = await fetch(`/api/admin/employees/${selectedEmployee.id}/pin`, {
-        method: "PATCH",
+      const response = await fetch(`/api/admin/employees?id=${selectedEmployee.id}&action=pin`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          pin: formPin.trim()
+          pin: formPin.trim(),
         }),
       });
 
       const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.error || "密碼變更失敗");
+        throw new Error(data.error || "密碼更新失敗");
       }
 
       setIsPinOpen(false);
-      alert("員工打卡密碼已變更成功！");
+      fetchEmployees();
     } catch (err: any) {
-      setFormError(err.message || "發生未知錯誤");
+      setFormError(err.message || "更新密碼時發生錯誤");
     } finally {
       setFormLoading(false);
     }
   };
 
-  // Toggle Active Status
+  // Toggle employee status
   const handleToggleStatus = async (emp: Employee) => {
-    const actionText = emp.isActive ? "停用" : "啟用";
-    if (!confirm(`確定要${actionText}員工「${emp.name}」的打卡權限嗎？`)) {
+    const actionName = emp.isActive ? "停用" : "啟用";
+    if (!confirm(`確定要${actionName}員工「${emp.name}」的帳號嗎？`)) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/admin/employees/${emp.id}/status`, {
-        method: "PATCH",
+      const response = await fetch(`/api/admin/employees?id=${emp.id}&action=status`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          isActive: !emp.isActive
+          isActive: !emp.isActive,
         }),
       });
 
       const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.error || `操作失敗`);
+        throw new Error(data.error || `${actionName}失敗`);
       }
 
       fetchEmployees();
     } catch (err: any) {
-      alert(err.message || "狀態更新失敗");
+      alert(err.message || `進行${actionName}操作時發生錯誤`);
     }
   };
 
@@ -261,27 +249,26 @@ export default function EmployeesPage() {
   });
 
   return (
-    <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+    <div className="space-y-6">
       
       {/* Top Header Card */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl glass-card relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-2xl -z-10" />
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
-            <Users className="w-6 h-6" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 rounded-xl border border-[#E5E7EB] bg-white shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-slate-100 border border-[#E5E7EB] flex items-center justify-center text-[#111111]">
+            <Users className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 via-amber-200 to-red-400 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-[#111111] tracking-tight">
               員工資料管理
             </h1>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#666666] mt-0.5">
               設定系統員工的識別工號、聯絡電話、時薪以及獨立的打卡密碼。
             </p>
           </div>
         </div>
         <button
           onClick={handleOpenCreate}
-          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-black bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 transition-all cursor-pointer shadow-lg shadow-amber-500/10 active:scale-[0.98] flex-shrink-0"
+          className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold text-xs text-white bg-[#111111] hover:bg-[#222222] transition-all cursor-pointer shadow-sm"
         >
           <Plus className="w-4 h-4" />
           新增員工
@@ -289,11 +276,11 @@ export default function EmployeesPage() {
       </div>
 
       {/* Filter and Table Container */}
-      <div className="p-6 rounded-2xl glass-card space-y-4">
+      <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white shadow-sm space-y-4">
         
         {/* Search Filter */}
         <div className="relative max-w-sm group">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500 group-focus-within:text-amber-500 transition-colors">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400 group-focus-within:text-[#111111] transition-colors">
             <Search className="w-4 h-4" />
           </span>
           <input
@@ -301,45 +288,45 @@ export default function EmployeesPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="搜尋姓名、編號或電話..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900/50 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/70 transition-all"
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] placeholder-slate-400 focus:outline-none focus:border-[#111111] transition-all"
           />
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <p>{error}</p>
+          <div className="flex items-start gap-2.5 p-3 rounded-lg bg-[#FEF2F2] border border-red-200 text-[#B91C1C] text-xs">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <p className="font-semibold">{error}</p>
           </div>
         )}
 
         {/* Employee Table */}
-        <div className="overflow-x-auto rounded-xl border border-slate-800/80 bg-slate-950/20">
-          <table className="w-full text-left border-collapse text-sm">
+        <div className="overflow-x-auto rounded-lg border border-[#E5E7EB]">
+          <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/50 text-slate-400 font-semibold text-xs tracking-wider">
-                <th className="py-4 px-5">員工工號</th>
-                <th className="py-4 px-5">員工姓名</th>
-                <th className="py-4 px-5">聯絡電話</th>
-                <th className="py-4 px-5">時薪</th>
-                <th className="py-4 px-5">狀態</th>
-                <th className="py-4 px-5">建立日期</th>
-                <th className="py-4 px-5 text-right">功能操作</th>
+              <tr className="border-b border-[#E5E7EB] bg-[#FAFAFA] text-[#666666] font-bold uppercase tracking-wider sticky top-0">
+                <th className="py-2.5 px-4">員工工號</th>
+                <th className="py-2.5 px-4">員工姓名</th>
+                <th className="py-2.5 px-4">聯絡電話</th>
+                <th className="py-2.5 px-4">時薪</th>
+                <th className="py-2.5 px-4">狀態</th>
+                <th className="py-2.5 px-4">建立日期</th>
+                <th className="py-2.5 px-4 text-right">功能操作</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-[#E5E7EB]">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
-                    <div className="inline-flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+                  <td colSpan={7} className="py-8 text-center text-[#666666]">
+                    <div className="inline-flex items-center gap-1.5">
+                      <Loader2 className="w-4 h-4 animate-spin text-[#111111]" />
                       載入員工資料中...
                     </div>
                   </td>
                 </tr>
               ) : filteredEmployees.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
+                  <td colSpan={7} className="py-8 text-center text-[#666666]">
                     沒有找到符合條件的員工
                   </td>
                 </tr>
@@ -347,43 +334,42 @@ export default function EmployeesPage() {
                 filteredEmployees.map((emp) => (
                   <tr 
                     key={emp.id} 
-                    className="border-b border-slate-900 hover:bg-slate-900/20 transition-colors text-slate-300"
+                    className="hover:bg-[#F5F5F5] transition-colors text-[#111111]"
                   >
-                    <td className="py-4 px-5 font-mono font-bold text-amber-500">{emp.employeeCode}</td>
-                    <td className="py-4 px-5 font-bold text-slate-100">{emp.name}</td>
-                    <td className="py-4 px-5 text-slate-400 font-medium">
+                    <td className="py-2.5 px-4 font-mono font-semibold text-[#111111]">{emp.employeeCode}</td>
+                    <td className="py-2.5 px-4 font-bold">{emp.name}</td>
+                    <td className="py-2.5 px-4 text-[#666666] font-medium">
                       {emp.phone ? (
                         <span className="flex items-center gap-1">
-                          <Phone className="w-3.5 h-3.5 text-slate-500" />
+                          <Phone className="w-3 h-3 text-[#666666]" />
                           {emp.phone}
                         </span>
                       ) : (
-                        <span className="text-slate-600">未提供</span>
+                        <span className="text-[#888888]">未提供</span>
                       )}
                     </td>
-                    <td className="py-4 px-5 font-semibold text-slate-200">
-                      ${emp.hourlyRate} <span className="text-[10px] text-slate-500">/ 小時</span>
+                    <td className="py-2.5 px-4 font-semibold text-[#111111]">
+                      NT$ {emp.hourlyRate} <span className="text-[10px] text-[#666666] font-normal">/ 小時</span>
                     </td>
-                    <td className="py-4 px-5">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                    <td className="py-2.5 px-4">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${
                         emp.isActive 
-                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                          : "bg-red-500/10 text-red-400 border border-red-500/20"
+                          ? "bg-[#EFF6FF] text-[#1D4ED8] border-[#EFF6FF]" 
+                          : "bg-[#F3F4F6] text-[#4B5563] border-[#F3F4F6]"
                       }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${emp.isActive ? "bg-emerald-400" : "bg-red-400"}`} />
                         {emp.isActive ? "啟用中" : "已停用"}
                       </span>
                     </td>
-                    <td className="py-4 px-5 text-xs text-slate-500 font-medium">
+                    <td className="py-2.5 px-4 text-[10px] text-[#666666] font-medium">
                       {formatDate(emp.createdAt)}
                     </td>
-                    <td className="py-3 px-5 text-right">
+                    <td className="py-2 px-4 text-right">
                       <div className="inline-flex items-center gap-1.5">
                         
                         {/* Edit Button */}
                         <button
                           onClick={() => handleOpenEdit(emp)}
-                          className="p-2 rounded-lg border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all cursor-pointer"
+                          className="p-1.5 rounded border border-[#E5E7EB] bg-white hover:bg-[#F5F5F5] text-[#111111] transition-all cursor-pointer"
                           title="編輯資料"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -392,7 +378,7 @@ export default function EmployeesPage() {
                         {/* Change PIN Button */}
                         <button
                           onClick={() => handleOpenPin(emp)}
-                          className="p-2 rounded-lg border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all cursor-pointer"
+                          className="p-1.5 rounded border border-[#E5E7EB] bg-white hover:bg-[#F5F5F5] text-[#111111] transition-all cursor-pointer"
                           title="修改打卡密碼"
                         >
                           <Key className="w-3.5 h-3.5" />
@@ -401,10 +387,10 @@ export default function EmployeesPage() {
                         {/* Toggle Status Button */}
                         <button
                           onClick={() => handleToggleStatus(emp)}
-                          className={`p-2 rounded-lg border transition-all cursor-pointer ${
+                          className={`p-1.5 rounded border transition-all cursor-pointer ${
                             emp.isActive 
-                              ? "border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15" 
-                              : "border-emerald-500/20 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/15"
+                              ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-100" 
+                              : "border-emerald-200 bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
                           }`}
                           title={emp.isActive ? "停用此員工" : "啟用此員工"}
                         >
@@ -425,66 +411,66 @@ export default function EmployeesPage() {
           CREATE EMPLOYEE MODAL
          ======================================================== */}
       {isCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-          <div className="w-full max-w-md glass-card rounded-2xl p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-[fadeIn_0.2s_ease-out]">
+          <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-xl p-5 relative shadow-lg">
             <button 
               onClick={() => setIsCreateOpen(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-300 transition-colors"
+              className="absolute top-4 right-4 text-[#666666] hover:text-[#111111] transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
-            <div className="flex items-center gap-2.5 mb-6">
-              <UserPlus className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-slate-100">新增員工帳號</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <UserPlus className="w-4 h-4 text-[#111111]" />
+              <h2 className="text-sm font-bold text-[#111111]">新增員工帳號</h2>
             </div>
             
             {formError && (
-              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-2">
+              <div className="mb-3 p-2.5 rounded-lg bg-[#FEF2F2] border border-red-200 text-[#B91C1C] text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <p>{formError}</p>
               </div>
             )}
 
-            <form onSubmit={handleCreateSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-400">員工編號 (工號)</label>
+            <form onSubmit={handleCreateSubmit} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#666666]">員工編號 (工號)</label>
                   <input
                     type="text"
                     required
                     value={formCode}
                     onChange={(e) => setFormCode(e.target.value)}
                     placeholder="例如: A001"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-400">員工姓名</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#666666]">員工姓名</label>
                   <input
                     type="text"
                     required
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="請輸入姓名"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                   />
                 </div>
               </div>
               
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400">聯絡電話 (選填)</label>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">聯絡電話 (選填)</label>
                 <input
                   type="text"
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   placeholder="請輸入電話 (選填)"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-400">設定時薪</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#666666]">設定時薪</label>
                   <input
                     type="number"
                     required
@@ -493,11 +479,11 @@ export default function EmployeesPage() {
                     value={formRate}
                     onChange={(e) => setFormRate(e.target.value)}
                     placeholder="每小時工資"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-400">4位數打卡 PIN</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#666666]">4位數打卡 PIN</label>
                   <input
                     type="password"
                     required
@@ -505,25 +491,25 @@ export default function EmployeesPage() {
                     value={formPin}
                     onChange={(e) => setFormPin(e.target.value)}
                     placeholder="純數字"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2.5 pt-3">
                 <button
                   type="button"
                   onClick={() => setIsCreateOpen(false)}
-                  className="flex-1 py-2.5 border border-slate-800 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-900 font-semibold text-sm transition-all"
+                  className="flex-1 py-2 rounded-lg border border-[#E5E7EB] bg-white text-[#666666] font-semibold hover:bg-[#F5F5F5] transition-all cursor-pointer text-center"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="flex-1 py-2.5 rounded-xl text-black bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 font-bold text-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="flex-1 py-2 rounded-lg bg-[#111111] hover:bg-[#222222] text-white font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer text-center"
                 >
-                  {formLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {formLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   確認新增
                 </button>
               </div>
@@ -536,52 +522,52 @@ export default function EmployeesPage() {
           EDIT EMPLOYEE DETAILS MODAL
          ======================================================== */}
       {isEditOpen && selectedEmployee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-          <div className="w-full max-w-md glass-card rounded-2xl p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-[fadeIn_0.2s_ease-out]">
+          <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-xl p-5 relative shadow-lg">
             <button 
               onClick={() => setIsEditOpen(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-300 transition-colors"
+              className="absolute top-4 right-4 text-[#666666] hover:text-[#111111] transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
-            <div className="flex items-center gap-2.5 mb-6">
-              <Edit2 className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-slate-100">編輯員工資料 ({selectedEmployee.employeeCode})</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <Edit2 className="w-4 h-4 text-[#111111]" />
+              <h2 className="text-sm font-bold text-[#111111]">編輯員工資料 ({selectedEmployee.employeeCode})</h2>
             </div>
             
             {formError && (
-              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-2">
+              <div className="mb-3 p-2.5 rounded-lg bg-[#FEF2F2] border border-red-200 text-[#B91C1C] text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <p>{formError}</p>
               </div>
             )}
 
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400">員工姓名</label>
+            <form onSubmit={handleEditSubmit} className="space-y-3 text-xs">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">員工姓名</label>
                 <input
                   type="text"
                   required
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="請輸入姓名"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                 />
               </div>
               
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400">聯絡電話 (選填)</label>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">聯絡電話 (選填)</label>
                 <input
                   type="text"
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   placeholder="請輸入電話 (選填)"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400">設定時薪</label>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">設定時薪</label>
                 <input
                   type="number"
                   required
@@ -590,24 +576,24 @@ export default function EmployeesPage() {
                   value={formRate}
                   onChange={(e) => setFormRate(e.target.value)}
                   placeholder="每小時工資"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2.5 pt-3">
                 <button
                   type="button"
                   onClick={() => setIsEditOpen(false)}
-                  className="flex-1 py-2.5 border border-slate-800 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-900 font-semibold text-sm transition-all"
+                  className="flex-1 py-2 rounded-lg border border-[#E5E7EB] bg-white text-[#666666] font-semibold hover:bg-[#F5F5F5] transition-all cursor-pointer text-center"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="flex-1 py-2.5 rounded-xl text-black bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 font-bold text-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="flex-1 py-2 rounded-lg bg-[#111111] hover:bg-[#222222] text-white font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer text-center"
                 >
-                  {formLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {formLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   確認變更
                 </button>
               </div>
@@ -620,33 +606,33 @@ export default function EmployeesPage() {
           CHANGE EMPLOYEE PIN MODAL
          ======================================================== */}
       {isPinOpen && selectedEmployee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-          <div className="w-full max-w-md glass-card rounded-2xl p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-[fadeIn_0.2s_ease-out]">
+          <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-xl p-5 relative shadow-lg">
             <button 
               onClick={() => setIsPinOpen(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-300 transition-colors"
+              className="absolute top-4 right-4 text-[#666666] hover:text-[#111111] transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
-            <div className="flex items-center gap-2.5 mb-6">
-              <Key className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-slate-100">變更打卡密碼</h2>
+            <div className="flex items-center gap-2 mb-3">
+              <Key className="w-4 h-4 text-[#111111]" />
+              <h2 className="text-sm font-bold text-[#111111]">變更打卡密碼</h2>
             </div>
 
-            <p className="text-xs text-slate-400 mb-4">
+            <p className="text-xs text-[#666666] mb-3">
               即將變更員工「{selectedEmployee.name}」的四位數打卡安全 PIN 碼。
             </p>
             
             {formError && (
-              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-2">
+              <div className="mb-3 p-2.5 rounded-lg bg-[#FEF2F2] border border-red-200 text-[#B91C1C] text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <p>{formError}</p>
               </div>
             )}
 
-            <form onSubmit={handlePinSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400">新 4 位數打卡密碼 (PIN)</label>
+            <form onSubmit={handlePinSubmit} className="space-y-3 text-xs">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#666666]">新 4 位數打卡密碼 (PIN)</label>
                 <input
                   type="password"
                   required
@@ -654,24 +640,24 @@ export default function EmployeesPage() {
                   value={formPin}
                   onChange={(e) => setFormPin(e.target.value)}
                   placeholder="請輸入 4 位數純數字"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-sm text-slate-200 focus:outline-none focus:border-amber-500/70"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E7EB] bg-white text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2.5 pt-3">
                 <button
                   type="button"
                   onClick={() => setIsPinOpen(false)}
-                  className="flex-1 py-2.5 border border-slate-800 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-900 font-semibold text-sm transition-all"
+                  className="flex-1 py-2 rounded-lg border border-[#E5E7EB] bg-white text-[#666666] font-semibold hover:bg-[#F5F5F5] transition-all cursor-pointer text-center"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="flex-1 py-2.5 rounded-xl text-black bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 font-bold text-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="flex-1 py-2 rounded-lg bg-[#111111] hover:bg-[#222222] text-white font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer text-center"
                 >
-                  {formLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {formLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   確認變更
                 </button>
               </div>
