@@ -1,0 +1,130 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String     @id @default(uuid())
+  username     String     @unique
+  passwordHash String
+  name         String?
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("users")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  details   String?
+  ipAddress String?
+  adminId   String?
+  admin     User?    @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model Employee {
+  id                String             @id @default(uuid())
+  employeeCode      String             @unique
+  name              String
+  phone             String?
+  hourlyRate        Float
+  pinHash           String
+  isActive          Boolean            @default(true)
+  attendanceRecords AttendanceRecord[]
+  clockEvents       ClockEvent[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@map("employees")
+}
+
+model Workplace {
+  id                  String       @id @default(uuid())
+  name                String       @default("三峽八方雲集國際店")
+  address             String       @default("新北市三峽區國際一街")
+  latitude            Float
+  longitude           Float
+  allowedRadiusMeters Float        @default(100)
+  warningRadiusMeters Float        @default(300)
+  workplaceToken      String       @unique
+  isActive            Boolean      @default(true)
+  clockEvents         ClockEvent[]
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@map("workplaces")
+}
+
+model AttendanceRecord {
+  id           String           @id @default(uuid())
+  employeeId   String
+  employee     Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date         DateTime
+  clockInTime  DateTime?
+  clockOutTime DateTime?
+  totalMinutes Int?
+  totalHours   Float?
+  status       AttendanceStatus @default(NORMAL)
+  note         String?
+  editedByBoss Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@unique([employeeId, date])
+  @@index([date])
+  @@index([employeeId])
+  @@index([employeeId, date])
+  @@map("attendance_records")
+}
+
+model ClockEvent {
+  id             String         @id @default(uuid())
+  employeeId     String
+  employee       Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  workplaceId    String
+  workplace      Workplace      @relation(fields: [workplaceId], references: [id], onDelete: Cascade)
+  eventType      ClockEventType
+  timestamp      DateTime       @default(now())
+  latitude       Float?
+  longitude      Float?
+  distanceMeters Float?
+  locationStatus LocationStatus
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime       @default(now())
+
+  @@index([employeeId])
+  @@index([workplaceId])
+  @@index([timestamp])
+  @@index([employeeId, timestamp])
+  @@map("clock_events")
+}
+
+enum AttendanceStatus {
+  NORMAL
+  LATE
+  EARLY_LEAVE
+  ABSENT
+  LEAVE
+}
+
+enum ClockEventType {
+  CLOCK_IN
+  CLOCK_OUT
+}
+
+enum LocationStatus {
+  NORMAL
+  SUSPICIOUS
+  BLOCKED
+  LOCATION_DENIED
+}
