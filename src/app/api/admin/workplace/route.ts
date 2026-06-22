@@ -4,6 +4,9 @@ import { getSessionAdmin } from "@/lib/auth";
 import { updateWorkplaceSchema } from "@/schemas/workplace";
 import crypto from "crypto";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   try {
     const admin = await getSessionAdmin();

@@ -4,6 +4,9 @@ import { comparePassword, signJWT } from "@/lib/auth";
 import { loginSchema } from "@/schemas/auth";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

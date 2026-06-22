@@ -4,6 +4,9 @@ import { getSessionAdmin } from "@/lib/auth";
 import { getTaiwanBusinessDate, getTaiwanDayRange } from "@/lib/date";
 import { createAttendanceSchema } from "@/schemas/attendance";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   try {
     const admin = await getSessionAdmin();

@@ -3,6 +3,9 @@ import { db } from "@/lib/db";
 import { getSessionAdmin } from "@/lib/auth";
 import { updateEmployeeSchema } from "@/schemas/employee";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
