@@ -15,19 +15,17 @@ import {
 } from "lucide-react";
 
 interface WorkplaceData {
-  id: string;
   name: string;
   address: string;
-  latitude: number;
-  longitude: number;
+  workplaceToken: string;
   allowedRadiusMeters: number;
   warningRadiusMeters: number;
-  workplaceToken: string;
+  clockUrl: string;
   fullClockUrl: string;
 }
 
 export default function QRCodePage() {
-  const [data, setData] = useState<WorkplaceData | null>(null);
+  const [qrData, setQrData] = useState<WorkplaceData | null>(null);
   const [qrDisplayUrl, setQrDisplayUrl] = useState<string | null>(null);
   const [qrDownloadUrl, setQrDownloadUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,13 +37,26 @@ export default function QRCodePage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/workplace/qr");
-      const result = await res.json();
-      if (res.ok && result.workplace) {
-        setData(result.workplace);
-        generateQRCodeUrls(result.workplace.fullClockUrl);
+      const res = await fetch("/api/admin/qr-code");
+      const text = await res.text();
+      
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        console.error("QR Code API raw response (first 300 chars):", text.slice(0, 300));
+        throw new Error("伺服器回傳格式錯誤，請重新登入或稍後再試");
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || "無法載入 QR Code 設定");
+      }
+
+      if (data.workplace) {
+        setQrData(data.workplace);
+        generateQRCodeUrls(data.workplace.fullClockUrl);
       } else {
-        throw new Error(result.error || "無法載入工作場所 QR 資料");
+        throw new Error("API 回傳資料格式不完整");
       }
     } catch (err: any) {
       setError(err.message || "載入工作場所資料失敗");
@@ -66,8 +77,8 @@ export default function QRCodePage() {
   }, []);
 
   const handleCopyUrl = () => {
-    if (!data) return;
-    navigator.clipboard.writeText(data.fullClockUrl);
+    if (!qrData) return;
+    navigator.clipboard.writeText(qrData.fullClockUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -138,7 +149,7 @@ export default function QRCodePage() {
         </div>
       )}
 
-      {data && (
+      {qrData && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Left Config Panel */}
@@ -154,14 +165,14 @@ export default function QRCodePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-[#111111]">
                 <div className="space-y-1">
                   <span className="text-xs text-[#666666] block">分店名稱</span>
-                  <span className="font-bold">{data.name}</span>
+                  <span className="font-bold">{qrData.name}</span>
                 </div>
                 
                 <div className="space-y-1">
                   <span className="text-xs text-[#666666] block">打卡允許半徑 / 警告半徑</span>
                   <span className="font-bold flex items-center gap-1.5">
                     <Radio className="w-3.5 h-3.5 text-[#666666]" />
-                    {data.allowedRadiusMeters} 米 / {data.warningRadiusMeters} 米
+                    {qrData.allowedRadiusMeters} 米 / {qrData.warningRadiusMeters} 米
                   </span>
                 </div>
 
@@ -169,15 +180,15 @@ export default function QRCodePage() {
                   <span className="text-xs text-[#666666] block">分店地址</span>
                   <span className="font-bold flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-[#666666]" />
-                    {data.address}
+                    {qrData.address}
                   </span>
                 </div>
 
                 <div className="md:col-span-2 space-y-2 pt-2 border-t border-[#E5E7EB]">
                   <span className="text-xs text-[#666666] block">完整打卡網址 (生產環境連結)</span>
                   <div className="p-3 rounded-lg bg-[#FAFAFA] border border-[#E5E7EB] font-mono text-xs flex items-center justify-between gap-3 text-[#111111]">
-                    <span className="truncate select-all" title={data.fullClockUrl}>
-                      {data.fullClockUrl}
+                    <span className="truncate select-all" title={qrData.fullClockUrl}>
+                      {qrData.fullClockUrl}
                     </span>
                     <button
                       onClick={handleCopyUrl}
@@ -215,7 +226,7 @@ export default function QRCodePage() {
               <div className="border border-[#E5E7EB] rounded-xl bg-white text-black p-8 max-w-sm mx-auto shadow-sm flex flex-col items-center justify-center text-center space-y-5">
                 <div>
                   <h3 className="text-lg font-bold text-[#111111]">
-                    {data.name} 員工打卡
+                    {qrData.name} 員工打卡
                   </h3>
                   <p className="text-xs font-semibold text-[#666666] mt-0.5">請掃描 QR Code 打卡</p>
                 </div>
@@ -231,8 +242,8 @@ export default function QRCodePage() {
                 )}
 
                 <div className="space-y-0.5 text-[10px] text-[#666666] font-semibold">
-                  <p>店家名稱：{data.name}</p>
-                  <p>打卡地址：{data.address}</p>
+                  <p>店家名稱：{qrData.name}</p>
+                  <p>打卡地址：{qrData.address}</p>
                 </div>
 
                 <div className="w-full border-t border-[#E5E7EB] pt-3 text-left space-y-1 text-[10px] text-[#666666] font-semibold max-w-[240px] mx-auto">
@@ -272,7 +283,7 @@ export default function QRCodePage() {
                 {qrDownloadUrl && (
                   <a
                     href={qrDownloadUrl}
-                    download={`${data.name}_打卡QRCode_1024px.png`}
+                    download={`${qrData.name}_打卡QRCode_1024px.png`}
                     className="w-full py-2.5 px-4 rounded-lg bg-white border border-[#111111] hover:bg-[#F5F5F5] text-[#111111] font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm text-center"
                   >
                     <Download className="w-4 h-4 text-[#111111]" />
@@ -318,14 +329,14 @@ export default function QRCodePage() {
       {/* ========================================================
           PRINT-ONLY SECTION (Hidden on screen view)
          ======================================================== */}
-      {data && (
+      {qrData && (
         <div className="hidden print-poster">
           <div className="w-full max-w-2xl text-center space-y-8">
             
             {/* Poster Header */}
             <div className="space-y-2">
               <h1 className="text-4xl font-extrabold tracking-tight text-slate-950" style={{ fontSize: "2.75rem" }}>
-                {data.name} 員工打卡
+                {qrData.name} 員工打卡
               </h1>
               <p className="text-xl font-bold text-slate-700" style={{ fontSize: "1.25rem" }}>
                 請掃描 QR Code 打卡
@@ -346,9 +357,9 @@ export default function QRCodePage() {
 
             {/* Location Address Details */}
             <div className="space-y-2 text-base text-slate-800 font-bold" style={{ fontSize: "1.1rem" }}>
-              <p>工作場所：{data.name}</p>
-              <p>打卡範圍：店面中心點半徑 {data.allowedRadiusMeters} 公尺內</p>
-              <p>地址：{data.address}</p>
+              <p>工作場所：{qrData.name}</p>
+              <p>打卡範圍：店面中心點半徑 {qrData.allowedRadiusMeters} 公尺內</p>
+              <p>地址：{qrData.address}</p>
             </div>
 
             {/* Divider */}
