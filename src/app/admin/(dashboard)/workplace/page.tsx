@@ -84,7 +84,7 @@ export default function WorkplacePage() {
 
     try {
       const res = await fetch("/api/admin/workplace", {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formName.trim(),
@@ -96,14 +96,32 @@ export default function WorkplacePage() {
         }),
       });
 
-      const result = await res.json();
+      const text = await res.text();
+      let result;
+      try {
+        result = text ? JSON.parse(text) : null;
+      } catch {
+        throw new Error(
+          `Invalid response from server: ${text.slice(0, 200)}`
+        );
+      }
 
       if (!res.ok) {
-        throw new Error(result.error || "儲存設定失敗");
+        throw new Error(result?.error || "儲存設定失敗");
       }
 
       setFormSuccess("工作定位設定已成功儲存！");
-      fetchWorkplace();
+      
+      // Update local state directly to keep coordinates visible without full page reload
+      if (result && result.workplace) {
+        setWorkplace(result.workplace);
+        setFormName(result.workplace.name);
+        setFormAddress(result.workplace.address);
+        setFormLat(result.workplace.latitude.toString());
+        setFormLon(result.workplace.longitude.toString());
+        setFormAllowedRadius(result.workplace.allowedRadiusMeters.toString());
+        setFormWarningRadius(result.workplace.warningRadiusMeters.toString());
+      }
     } catch (err: any) {
       setFormError(err.message || "更新設定時發生錯誤");
     } finally {

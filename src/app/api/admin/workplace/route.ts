@@ -53,15 +53,24 @@ export async function PATCH(request: NextRequest) {
   try {
     const admin = await getSessionAdmin();
     if (!admin) {
-      return NextResponse.json({ error: "未授權訪問" }, { status: 401 });
+      return Response.json(
+        {
+          success: false,
+          error: "未授權訪問"
+        },
+        { status: 400 }
+      );
     }
 
     const body = await request.json();
     const result = updateWorkplaceSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: "欄位驗證錯誤", details: result.error.format() },
+      return Response.json(
+        {
+          success: false,
+          error: "欄位驗證錯誤"
+        },
         { status: 400 }
       );
     }
@@ -70,7 +79,13 @@ export async function PATCH(request: NextRequest) {
     const workplace = await db.workplace.findFirst();
 
     if (!workplace) {
-      return NextResponse.json({ error: "找不到工作地設定" }, { status: 404 });
+      return Response.json(
+        {
+          success: false,
+          error: "找不到工作地設定"
+        },
+        { status: 400 }
+      );
     }
 
     const { name, address, latitude, longitude, allowedRadiusMeters, warningRadiusMeters } = result.data;
@@ -98,9 +113,18 @@ export async function PATCH(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, workplace: updatedWorkplace });
+    return Response.json({
+      success: true,
+      workplace: updatedWorkplace
+    });
   } catch (error) {
     console.error("PATCH Workplace API Error:", error);
-    return NextResponse.json({ error: "伺服器內部錯誤" }, { status: 500 });
+    return Response.json(
+      {
+        success: false,
+        error: "伺服器內部錯誤"
+      },
+      { status: 400 }
+    );
   }
 }
